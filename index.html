@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Elite Casino — Premium Gaming</title>
+  <link rel="stylesheet" href="assets/style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0f0a1a 100%);
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background stars */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 60px 70px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 50px 50px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 130px 80px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 90px 10px, #fff, rgba(0,0,0,0));
+      background-repeat: repeat;
+      background-size: 200px 200px;
+      animation: twinkle 5s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.8; }
+    }
+
+    .main-wrapper {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero-section {
+      text-align: center;
+      padding: 60px 20px 40px;
+      background: linear-gradient(180deg, rgba(255,215,0,0.05) 0%, rgba(255,215,0,0) 100%);
+      border-bottom: 2px solid rgba(255,215,0,0.2);
+      margin-bottom: 50px;
+    }
+
+    .logo {
+      font-size: 3.5em;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffa500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 2px;
+      text-shadow: 0 0 30px rgba(255,215,0,0.3);
+      margin-bottom: 15px;
+    }
+
+    .tagline {
+      font-size: 1.2em;
+      color: #b0b0b0;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .tagline-accent {
+      color: #ffd700;
+      font-weight: bold;
+    }
+
+    /* Bankroll Display Section */
+    .bankroll-display {
+      text-align: center;
+    }
+
+    .bankroll-label {
+      font-size: 0.9em;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .bankroll-amount {
+      font-size: 1.8em;
+      font-weight: 900;
+      color: #00ff00;
+      text-shadow: 0 0 20px rgba(0,255,0,0.5);
+    }
+
+    .bankroll-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .bankroll-controls input {
+      padding: 10px 15px;
+      background: rgba(255,255,255,0.05);
+      border: 2px solid rgba(255,215,0,0.3);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.95em;
+      width: 140px;
+    }
+
+    .bankroll-controls input::placeholder {
+      color: #666;
+    }
+
+    .bankroll-controls input:focus {
+      outline: none;
+      border-color: #ffd700;
+      background: rgba(255,215,0,0.1);
+    }
+
+    .bankroll-controls button {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.95em;
+    }
+
+    .bankroll-controls button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(255,215,0,0.4);
+    }
+
+    .bankroll-controls button:active {
+      transform: translateY(0);
+    }
+
+    #menu-reset-btn {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+      color: #fff;
+    }
+
+    #menu-reset-btn:hover {
+      box-shadow: 0 5px 20px rgba(255,107,107,0.4);
+    }
+
+    /* Bankroll Section */
+    .bankroll-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 30px;
+      padding: 40px;
+      background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0.03) 100%);
+      border: 2px solid rgba(255,215,0,0.4);
+      border-radius: 20px;
+      margin: 40px auto;
+      max-width: 700px;
+      box-shadow: 0 10px 40px rgba(255,215,0,0.15);
+    }
+
+    .bankroll-display {
+      text-align: center;
+      padding: 20px;
+      background: rgba(0,255,0,0.05);
+      border-radius: 15px;
+      border: 1px solid rgba(0,255,0,0.2);
+    }
+
+    .bankroll-label {
+      font-size: 1em;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .bankroll-amount {
+      font-size: 2.2em;
+      font-weight: 900;
+      color: #00ff00;
+      text-shadow: 0 0 20px rgba(0,255,0,0.6);
+      letter-spacing: 1px;
+    }
+    .games-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+      flex: 1;
+    }
+
+    .section-title {
+      font-size: 1.8em;
+      font-weight: 700;
+      color: #ffd700;
+      margin-bottom: 30px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+      margin-bottom: 50px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .game-card {
+      background: linear-gradient(135deg, rgba(255,215,0,0.05) 0%, rgba(255,215,0,0) 100%);
+      border: 2px solid rgba(255,215,0,0.2);
+      border-radius: 15px;
+      padding: 30px 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,215,0,0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .game-card:hover::before {
+      left: 100%;
+    }
+
+    .game-card:hover {
+      border-color: rgba(255,215,0,0.6);
+      background: linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,215,0,0.05) 100%);
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(255,215,0,0.2);
+    }
+
+    .game-icon {
+      font-size: 3.5em;
+      margin-bottom: 15px;
+      display: inline-block;
+      transition: all 0.3s;
+    }
+
+    .game-card:hover .game-icon {
+      transform: scale(1.15) rotate(5deg);
+      filter: drop-shadow(0 0 15px rgba(255,215,0,0.6));
+    }
+
+    .game-card h3 {
+      font-size: 1.5em;
+      margin-bottom: 12px;
+      color: #ffd700;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .game-card p {
+      color: #aaa;
+      font-size: 0.95em;
+      margin-bottom: 20px;
+      line-height: 1.5;
+      flex-grow: 1;
+    }
+
+    .play-btn {
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      color: #000;
+      padding: 12px 32px;
+      border: none;
+      border-radius: 25px;
+      font-weight: 700;
+      font-size: 0.95em;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+      letter-spacing: 1px;
+      box-shadow: 0 5px 15px rgba(255,215,0,0.3);
+    }
+
+    .play-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba(255,215,0,0.5);
+    }
+
+    .play-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: #666;
+      font-size: 0.9em;
+      border-top: 1px solid rgba(255,215,0,0.2);
+      background: rgba(0,0,0,0.3);
+    }
+
+    footer small {
+      color: #888;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .logo {
+        font-size: 2.5em;
+      }
+
+      .hero-section {
+        padding: 40px 20px 30px;
+        margin-bottom: 30px;
+      }
+
+      .bankroll-section {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 30px;
+        max-width: 100%;
+      }
+
+      .menu-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .game-card {
+        padding: 20px 15px;
+      }
+
+      .game-icon {
+        font-size: 2.5em;
+      }
+
+      .game-card h3 {
+        font-size: 1.2em;
+      }
+
+      .play-btn {
+        padding: 10px 24px;
+        font-size: 0.9em;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo {
+        font-size: 2em;
+      }
+
+      .tagline {
+        font-size: 1em;
+      }
+
+      .menu-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bankroll-controls {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .bankroll-controls input {
+        width: 100%;
+      }
+
+      .bankroll-controls button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-wrapper">
+    <div class="hero-section">
+      <div class="logo">🎮 GAMBLING SIM 🎮</div>
+      <div class="tagline">Premium <span class="tagline-accent">Single-Player</span> Gaming Experience</div>
+    </div>
+
+    <div class="games-container">
+      <!-- Bankroll Controller -->
+      <div class="bankroll-section">
+        <div class="bankroll-display">
+          <div class="bankroll-label">💵 Balance</div>
+          <div class="bankroll-amount" id="menu-bankroll2">$1,000.00</div>
+        </div>
+        <div class="bankroll-controls">
+          <input id="menu-set-bank2" type="number" min="0" placeholder="Custom amount" />
+          <button id="menu-set-btn2">Set Balance</button>
+          <button id="menu-reset-btn2">Reset</button>
+        </div>
+      </div>
+
+      <!-- Games Grid -->
+      <div class="section-title">Choose Your Game</div>
+      <section class="menu-grid">
+        <div class="game-card">
+          <div class="game-icon">🂡</div>
+          <h3>Blackjack</h3>
+          <p>Classic 21 — Beat the dealer with strategy and luck.</p>
+          <a class="play-btn" href="games/blackjack/index.html">Play Now</a>
+        </div>
+
+        <div class="game-card">
+          <div class="game-icon">🎡</div>
+          <h3>Roulette</h3>
+          <p>Spin the wheel and place your bets. European roulette odds.</p>
+          <a class="play-btn" href="games/roulette/index.html">Play Now</a>
+        </div>
+
+        <div class="game-card">
+          <div class="game-icon">⚪</div>
+          <h3>Plinko</h3>
+          <p>Drop a puck and watch it bounce to your prize.</p>
+          <a class="play-btn" href="games/plinko/index.html">Play Now</a>
+        </div>
+
+        <div class="game-card">
+          <div class="game-icon">🎲</div>
+          <h3>Dice</h3>
+          <p>Bet high or low. Simple, fast, and thrilling.</p>
+          <a class="play-btn" href="games/dice/index.html">Play Now</a>
+        </div>
+
+        <div class="game-card">
+          <div class="game-icon">📈</div>
+          <h3>Crash</h3>
+          <p>Cash out before it crashes! Escalating multiplier.</p>
+          <a class="play-btn" href="games/crash/index.html">Play Now</a>
+        </div>
+
+        <div class="game-card">
+          <div class="game-icon">💣</div>
+          <h3>Mines</h3>
+          <p>Uncover tiles and avoid hidden mines. Provably-fair.</p>
+          <a class="play-btn" href="games/mines/index.html">Play Now</a>
+        </div>
+
+        <div class="game-card">
+          <div class="game-icon">🎰</div>
+          <h3>Slots</h3>
+          <p>Classic spinning reels. Spin and win!</p>
+          <a class="play-btn" href="games/slots/index.html">Play Now</a>
+        </div>
+
+        <div class="game-card">
+          <div class="game-icon">🃏</div>
+          <h3>Higher / Lower</h3>
+          <p>Guess if the next card is higher. Climb to big multipliers.</p>
+          <a class="play-btn" href="games/higherlower/index.html">Play Now</a>
+        </div>
+
+        <div class="game-card">
+          <div class="game-icon">💰</div>
+          <h3>Coin Toss</h3>
+          <p>Heads or Tails? Provably-fair 50/50 bet.</p>
+          <a class="play-btn" href="games/cointoss/index.html">Play Now</a>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <small>💾 Your bankroll is stored securely in your browser's local storage. Refresh anytime — your balance persists.</small>
+    </footer>
+  </div>
+
+  <script src="assets/settings.js"></script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Blackjack — Casino</title>
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0f0a1a 100%);
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    .left-sidebar {
+      width: 240px;
+      padding: 25px 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      background: linear-gradient(180deg, rgba(255,215,0,0.05) 0%, rgba(255,215,0,0) 100%);
+      border-right: 3px solid rgba(255,215,0,0.3);
+      box-shadow: inset -10px 0 30px rgba(0,0,0,0.3), 5px 0 20px rgba(255,215,0,0.1);
+    }
+
+    .sidebar-balance {
+      text-align: center;
+      padding: 20px 15px;
+      background: linear-gradient(135deg, rgba(0,255,0,0.08) 0%, rgba(0,255,0,0.02) 100%);
+      border: 2px solid rgba(0,255,0,0.3);
+      border-radius: 15px;
+      box-shadow: 0 8px 24px rgba(0,255,0,0.1), inset 0 1px 0 rgba(0,255,0,0.2);
+    }
+
+    .sidebar-balance p {
+      font-size: 0.75em;
+      color: #aaa;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+    }
+
+    .sidebar-balance .amount {
+      font-size: 2.2em;
+      color: #00ff00;
+      font-weight: 900;
+      text-shadow: 0 0 20px rgba(0,255,0,0.6);
+      letter-spacing: 1px;
+      display: block;
+      line-height: 1.2;
+    }
+
+    .sidebar-result {
+      text-align: center;
+      padding: 20px 15px;
+      border-radius: 15px;
+      min-height: 90px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+    }
+
+    .sidebar-result.show {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    .sidebar-result.win {
+      background: linear-gradient(135deg, rgba(0,255,0,0.12) 0%, rgba(0,255,0,0.04) 100%);
+      border: 2px solid rgba(0,255,0,0.5);
+      color: #00ff00;
+      box-shadow: 0 8px 24px rgba(0,255,0,0.2), inset 0 1px 0 rgba(0,255,0,0.3);
+    }
+
+    .sidebar-result.lose {
+      background: linear-gradient(135deg, rgba(255,85,85,0.12) 0%, rgba(255,85,85,0.04) 100%);
+      border: 2px solid rgba(255,85,85,0.5);
+      color: #ff5555;
+      box-shadow: 0 8px 24px rgba(255,85,85,0.2), inset 0 1px 0 rgba(255,85,85,0.3);
+    }
+
+    .sidebar-result.push {
+      background: linear-gradient(135deg, rgba(255,204,0,0.12) 0%, rgba(255,204,0,0.04) 100%);
+      border: 2px solid rgba(255,204,0,0.5);
+      color: #ffcc00;
+      box-shadow: 0 8px 24px rgba(255,204,0,0.2), inset 0 1px 0 rgba(255,204,0,0.3);
+    }
+
+    .sidebar-result-text {
+      font-size: 1.1em;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .sidebar-result-amount {
+      font-size: 1.6em;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-shadow: 0 0 15px rgba(255,255,255,0.2);
+    }
+
+    #blackjack-container {
+      max-width: 900px;
+      margin: 0 auto 0 0;
+      padding: 15px 20px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex: 1;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding: 12px 15px;
+      background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0.03) 100%);
+      border: 2px solid rgba(255,215,0,0.3);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(255,215,0,0.05);
+    }
+
+    .header-bar h1 {
+      margin: 0;
+      font-size: 1.8em;
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .back-link {
+      color: #aaa;
+      text-decoration: none;
+      font-size: 0.85em;
+      padding: 6px 12px;
+      border: 2px solid rgba(255,215,0,0.3);
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+
+    .back-link:hover {
+      color: #ffd700;
+      border-color: #ffd700;
+      background: rgba(255,215,0,0.1);
+    }
+
+    .bankroll-display {
+      text-align: center;
+      padding: 12px 15px;
+      background: rgba(0,255,0,0.05);
+      border: 2px solid rgba(0,255,0,0.3);
+      border-radius: 10px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(0,255,0,0.05);
+    }
+
+    .bankroll-display p {
+      font-size: 0.75em;
+      color: #aaa;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .bankroll-amount {
+      color: #00ff00;
+      font-weight: 900;
+      font-size: 1.5em;
+      text-shadow: 0 0 15px rgba(0,255,0,0.5);
+      letter-spacing: 0.5px;
+    }
+
+    .table {
+      background: linear-gradient(135deg, #0d3d0d 0%, #1a5c1a 100%);
+      border: 3px solid #44aa44;
+      border-radius: 15px;
+      padding: 25px 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6), inset 0 0 20px rgba(68,170,68,0.08);
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .table::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 100%);
+      border-radius: 20px;
+      pointer-events: none;
+    }
+
+    .hand-area {
+      margin-bottom: 20px;
+      min-height: 110px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hand-label {
+      font-size: 1em;
+      color: #fff;
+      margin-bottom: 10px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .hand-cards {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .card {
+      width: 55px;
+      height: 80px;
+      background: white;
+      border: 2px solid #222;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.2em;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+      position: relative;
+      transition: all 0.3s;
+      cursor: default;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+
+    .card.red {
+      color: #e53935;
+    }
+
+    .card.black {
+      color: #000;
+    }
+
+    .card-rank {
+      font-size: 1.1em;
+      line-height: 1;
+    }
+
+    .card-suit {
+      font-size: 1.1em;
+      margin-top: 4px;
+    }
+
+    .card-back {
+      background: linear-gradient(135deg, #003d82 0%, #0066cc 100%);
+      border: 3px solid #001a4d;
+      color: #fff;
+      font-size: 1.2em;
+      box-shadow: 0 8px 24px rgba(0, 40, 100, 0.6), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    .hand-value {
+      color: #00ff00;
+      font-size: 1.1em;
+      margin-left: 15px;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(0,255,0,0.5);
+      letter-spacing: 0.5px;
+    }
+
+    .dealer-hand .hand-label {
+      color: #ffcc00;
+    }
+
+    .player-hand .hand-label {
+      color: #00d4ff;
+    }
+
+    .divider {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      margin: 15px 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .controls-section {
+      background: linear-gradient(135deg, rgba(255,215,0,0.05) 0%, rgba(255,215,0,0.02) 100%);
+      border: 2px solid rgba(255,215,0,0.3);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 10px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    .control-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .control-group label {
+      color: #ffd700;
+      font-weight: bold;
+      font-size: 0.9em;
+      letter-spacing: 0.5px;
+    }
+
+    .control-group input {
+      padding: 8px 12px;
+      font-size: 0.95em;
+      border: 2px solid rgba(255,215,0,0.4);
+      border-radius: 6px;
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      width: 80px;
+      transition: all 0.3s;
+      font-weight: bold;
+    }
+
+    .control-group input:focus {
+      outline: none;
+      border-color: #ffd700;
+      background: rgba(255,215,0,0.1);
+      box-shadow: 0 0 15px rgba(255,215,0,0.3);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 18px;
+      font-size: 0.95em;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    #deal {
+      background: linear-gradient(135deg, #00d960 0%, #00b84d 100%);
+      color: #000;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    #deal:hover:not(:disabled) {
+      background: linear-gradient(135deg, #00ff6b 0%, #00d960 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,255,107,0.4);
+    }
+
+    #deal:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    #hit {
+      background: linear-gradient(135deg, #0099ff 0%, #0077cc 100%);
+      color: #fff;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    #hit:hover:not(:disabled) {
+      background: linear-gradient(135deg, #00ccff 0%, #0099ff 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,204,255,0.4);
+    }
+
+    #hit:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    #stand {
+      background: linear-gradient(135deg, #ff6b35 0%, #dd4814 100%);
+      color: #fff;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    #stand:hover:not(:disabled) {
+      background: linear-gradient(135deg, #ff8555 0., #ff6b35 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(255,107,53,0.4);
+    }
+
+    #stand:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .result-display {
+      background: linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 100%);
+      border: 3px solid #ffcc00;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      margin-top: 0;
+      font-size: 1.3em;
+      font-weight: bold;
+      min-height: 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffcc00;
+      box-shadow: 0 8px 28px rgba(255,204,0,0.15);
+    }
+
+    .result-display.win {
+      color: #00ff00;
+      border-color: #00ff00;
+      box-shadow: 0 10px 40px rgba(0,255,0,0.3);
+    }
+
+    .result-display.lose {
+      color: #ff5555;
+      border-color: #ff5555;
+      box-shadow: 0 10px 40px rgba(255,85,85,0.3);
+    }
+
+    .result-display.push {
+      color: #ffcc00;
+      border-color: #ffcc00;
+      box-shadow: 0 10px 40px rgba(255,204,0,0.2);
+    }
+
+    .message-text {
+      margin-top: 8px;
+      font-size: 1.1em;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 768px) {
+      #blackjack-container {
+        padding: 15px;
+      }
+
+      .header-bar {
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .header-bar h1 {
+        font-size: 2em;
+      }
+
+      .table {
+        padding: 30px 20px;
+        margin-bottom: 25px;
+      }
+
+      .hand-area {
+        margin-bottom: 30px;
+        min-height: 140px;
+      }
+
+      .card {
+        width: 65px;
+        height: 95px;
+        font-size: 1.3em;
+      }
+
+      .controls-section {
+        padding: 20px;
+      }
+
+      .control-group {
+        gap: 10px;
+      }
+
+      .button-group {
+        width: 100%;
+      }
+
+      button {
+        flex: 1;
+        min-width: 0;
+        padding: 12px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Left Sidebar -->
+  <div class="left-sidebar">
+    <div class="sidebar-balance">
+      <p>💰 Balance</p>
+      <div class="amount" id="sidebar-bankroll">$0</div>
+    </div>
+    
+    <div class="sidebar-result" id="sidebar-result">
+      <div class="sidebar-result-text" id="sidebar-result-text"></div>
+      <div class="sidebar-result-amount" id="sidebar-result-amount"></div>
+    </div>
+  </div>
+
+  <div id="blackjack-container">
+    <div class="header-bar">
+      <h1>🂡 BLACKJACK</h1>
+      <a href="../../index.html" class="back-link">← Back to Games</a>
+    </div>
+
+    <div class="table">
+      <!-- Dealer Hand -->
+      <div class="hand-area dealer-hand">
+        <div class="hand-label">🎩 Dealer</div>
+        <div class="hand-cards" id="dealer-cards"></div>
+        <div class="hand-value" id="dealer-value"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Player Hand -->
+      <div class="hand-area player-hand">
+        <div class="hand-label">👤 Your Hand</div>
+        <div class="hand-cards" id="player-cards"></div>
+        <div class="hand-value" id="player-value"></div>
+      </div>
+    </div>
+
+    <!-- Controls Section -->
+    <div class="controls-section">
+      <div class="control-group">
+        <label for="bet">💵 Bet Amount:</label>
+        <input id="bet" type="number" min="1" step="1" value="10" />
+        <div class="button-group">
+          <button id="deal">Deal Hand</button>
+        </div>
+      </div>
+
+      <div class="button-group" id="action-buttons" style="display: none;">
+        <button id="hit">Hit</button>
+        <button id="stand">Stand</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

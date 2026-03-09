@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Roulette — Casino</title>
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0f0a1a 100%);
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+    }
+    .left-sidebar {
+      width: 240px;
+      padding: 25px 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      background: linear-gradient(180deg, rgba(255,215,0,0.05) 0%, rgba(255,215,0,0) 100%);
+      border-right: 3px solid rgba(255,215,0,0.3);
+      box-shadow: inset -10px 0 30px rgba(0,0,0,0.3), 5px 0 20px rgba(255,215,0,0.1);
+    }
+    .sidebar-balance {
+      text-align: center;
+      padding: 20px 15px;
+      background: linear-gradient(135deg, rgba(0,255,0,0.08) 0%, rgba(0,255,0,0.02) 100%);
+      border: 2px solid rgba(0,255,0,0.3);
+      border-radius: 15px;
+      box-shadow: 0 8px 24px rgba(0,255,0,0.1), inset 0 1px 0 rgba(0,255,0,0.2);
+    }
+    .sidebar-balance p {
+      font-size: 0.75em;
+      color: #aaa;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+    }
+    .sidebar-balance .amount {
+      font-size: 2.2em;
+      color: #00ff00;
+      font-weight: 900;
+      text-shadow: 0 0 20px rgba(0,255,0,0.6);
+      letter-spacing: 1px;
+      display: block;
+      line-height: 1.2;
+    }
+    .sidebar-result {
+      text-align: center;
+      padding: 20px 15px;
+      border-radius: 15px;
+      min-height: 90px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 1;
+      transform: scale(1);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .sidebar-result.win {
+      background: linear-gradient(135deg, rgba(0,255,0,0.12) 0%, rgba(0,255,0,0.04) 100%);
+      border: 2px solid rgba(0,255,0,0.5);
+      color: #00ff00;
+      box-shadow: 0 8px 24px rgba(0,255,0,0.2), inset 0 1px 0 rgba(0,255,0,0.3);
+    }
+    .sidebar-result.lose {
+      background: linear-gradient(135deg, rgba(255,85,85,0.12) 0%, rgba(255,85,85,0.04) 100%);
+      border: 2px solid rgba(255,85,85,0.5);
+      color: #ff5555;
+      box-shadow: 0 8px 24px rgba(255,85,85,0.2), inset 0 1px 0 rgba(255,85,85,0.3);
+    }
+    .sidebar-result-text {
+      font-size: 1.1em;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .sidebar-result-amount {
+      font-size: 1.6em;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-shadow: 0 0 15px rgba(255,255,255,0.2);
+    }
+    #roulette-container {
+      max-width: 900px;
+      margin: 0 auto 0 0;
+      padding: 15px 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      flex: 1;
+    }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding: 12px 15px;
+      background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0.03) 100%);
+      border: 2px solid rgba(255,215,0,0.3);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(255,215,0,0.05);
+    }
+    .header-bar h1 {
+      margin: 0;
+      font-size: 1.8em;
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+    .back-link {
+      color: #aaa;
+      text-decoration: none;
+      font-size: 0.85em;
+      padding: 6px 12px;
+      border: 2px solid rgba(255,215,0,0.3);
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+    .back-link:hover {
+      color: #ffd700;
+      border-color: #ffd700;
+      background: rgba(255,215,0,0.1);
+    }
+    .table {
+      background: linear-gradient(135deg, #0d3d0d 0%, #1a5c1a 100%);
+      border: 3px solid #44aa44;
+      border-radius: 15px;
+      padding: 25px 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6), inset 0 0 20px rgba(68,170,68,0.08);
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .table::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 100%);
+      border-radius: 20px;
+      pointer-events: none;
+    }
+    #wheel-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    #wheel {
+      border-radius: 10px;
+      background: #021017;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .controls-section {
+      background: linear-gradient(135deg, rgba(255,215,0,0.05) 0%, rgba(255,215,0,0.02) 100%);
+      border: 2px solid rgba(255,215,0,0.3);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 120px;
+    }
+    .control-group label {
+      color: #ffd700;
+      font-weight: bold;
+      font-size: 0.95em;
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
+    }
+    .control-group input,
+    .control-group select {
+      padding: 8px 10px;
+      font-size: 0.98em;
+      border: 2px solid rgba(255,215,0,0.4);
+      border-radius: 6px;
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      font-weight: bold;
+      transition: all 0.3s;
+      width: 90px;
+    }
+    .control-group input:focus,
+    .control-group select:focus {
+      outline: none;
+      border-color: #ffd700;
+      background: rgba(255,215,0,0.1);
+      box-shadow: 0 0 10px rgba(255,215,0,0.18);
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    button {
+      padding: 10px 18px;
+      font-size: 1em;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      min-width: 90px;
+    }
+    #spin {
+      background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+      color: #181818;
+    }
+    #spin:hover:not(:disabled) {
+      background: linear-gradient(135deg, #fff873 0%, #ffed4e 100%);
+      box-shadow: 0 8px 28px rgba(255,239,78,0.28);
+      transform: translateY(-2.5px);
+    }
+    #quick {
+      background: linear-gradient(135deg, #00d960 0%, #00b84d 100%);
+      color: #fff;
+    }
+    #quick:hover:not(:disabled) {
+      background: linear-gradient(135deg,#00ff6b 0%,#00d960 100%);
+      box-shadow: 0 8px 28px rgba(0,255,107,0.2);
+      transform: translateY(-2.5px);
+    }
+    #clear {
+      background: linear-gradient(135deg, #ff6b35 0%, #dd4814 100%);
+      color: #fff;
+    }
+    #clear:hover:not(:disabled) {
+      background: linear-gradient(135deg,#ff8555 0%,#ff6b35 100%);
+      box-shadow: 0 8px 28px rgba(255,107,53,0.13);
+      transform: translateY(-2.5px);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .result-display {
+      background: linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 100%);
+      border: 3px solid #ffcc00;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      margin-top: 0;
+      font-size: 1.2em;
+      font-weight: bold;
+      min-height: 60px;
+      color: #ffcc00;
+      box-shadow: 0 8px 28px rgba(255,204,0,0.13);
+      margin-bottom: 12px;
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .result-display.win {
+      color: #00ff00;
+      border-color: #00ff00;
+      box-shadow: 0 10px 40px rgba(0,255,0,0.21);
+    }
+    .result-display.lose {
+      color: #ff5555;
+      border-color: #ff5555;
+      box-shadow: 0 10px 40px rgba(255,85,85,0.13);
+    }
+    #fair-stuff {
+      margin-top: 14px;
+      padding: 10px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.08) 100%);
+      font-size: 13px;
+      color: #ffd700;
+    }
+    #payout { color: #ffd700; }
+    #roulette-log { margin-top: 6px; font-size: 1em; }
+    @media (max-width: 768px) {
+      .left-sidebar { display: none; }
+      #roulette-container { padding: 5px; }
+      .header-bar { padding: 10px; font-size: 1.2em; }
+      .table { padding: 10px 3px; }
+      #wheel { width: 290px; height: 290px; }
+      .controls-section { gap: 8px; padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar like Blackjack -->
+  <div class="left-sidebar">
+    <div class="sidebar-balance">
+      <p>💰 Balance</p>
+      <div class="amount" id="sidebar-bankroll">$0</div>
+    </div>
+    <div class="sidebar-result" id="sidebar-result">
+      <div class="sidebar-result-text" id="sidebar-result-text">Result</div>
+      <div class="sidebar-result-amount" id="sidebar-result-amount">$0</div>
+    </div>
+  </div>
+  <div id="roulette-container">
+    <!-- Hidden bankroll element for JS compatibility -->
+    <span id="bankroll" style="display:none"></span>
+    <div class="header-bar">
+      <h1>🎲 ROULETTE</h1>
+      <a href="../../index.html" class="back-link">← Back to Games</a>
+    </div>
+    <div class="table">
+      <div id="wheel-container">
+        <canvas id="wheel" width="520" height="520"></canvas>
+      </div>
+    </div>
+    <form class="controls-section" onsubmit="return false;">
+      <div class="control-group">
+        <label>Bet Amount</label>
+        <input id="bet" type="number" min="1" value="10">
+      </div>
+      <div class="control-group">
+        <label>Bet Type</label>
+        <select id="bet-type">
+          <option value="number">Single Number (35:1)</option>
+          <option value="color">Color (Red/Black) — 1:1</option>
+          <option value="parity">Odd / Even — 1:1</option>
+          <option value="dozen">Dozen — 2:1</option>
+          <option value="column">Column — 2:1</option>
+          <option value="highlow">High / Low — 1:1</option>
+        </select>
+      </div>
+      <div class="control-group" id="bet-params"></div>
+      <div class="button-group">
+        <button type="button" id="spin">Spin</button>
+        <button type="button" id="quick">Quick</button>
+        <button type="button" id="clear">Clear</button>
+      </div>
+      <div class="control-group" style="padding-top: 5px;">
+        <span>Payout: <span id="payout"></span></span>
+      </div>
+    </form>
+    <div class="result-display" id="roulette-result-display">
+      <div><strong>Last Outcome:</strong> <span id="last-outcome">-</span></div>
+      <div><strong>Result:</strong> <span id="result">-</span></div>
+    </div>
+    <div id="roulette-log"></div>
+    <div id="fair-stuff">
+      <strong>Provably Fair:</strong><br>
+      <span>Server Hash: <span id="server-hash" title="-">-</span></span><br>
+      <span>Server Seed: <span id="server-seed" title="-">-</span></span><br>
+      <label>Client Seed: <input id="client-seed" maxlength="50" placeholder="Optional, for fairness audit"></label>
+    </div>
+  </div>
+  <script src="roulette.js"></script>
+  <script>
+    // Sync bankroll/result to sidebar from the hidden #bankroll / #result
+    function syncSidebar() {
+      var bankroll = document.getElementById('bankroll')?.textContent || '$0';
+      document.getElementById('sidebar-bankroll').textContent = bankroll;
+      var res = document.getElementById('result')?.textContent || '-';
+      var amt = (res.match(/([\\d\\.]+)/) || [0,0])[1]
+      document.getElementById('sidebar-result-amount').textContent = (amt ? '$'+amt : '-');
+      document.getElementById('sidebar-result-text').textContent = res.includes('Win') ? 'WIN!' : (res.includes('Lose') ? 'LOSE' : 'RESULT');
+      var box = document.getElementById('sidebar-result');
+      box.className = 'sidebar-result'+(res.includes('Win') ? ' win' : (res.includes('Lose') ? ' lose' : ''));
+    }
+    setInterval(syncSidebar, 350);
+  </script>
+</body>
+</html>

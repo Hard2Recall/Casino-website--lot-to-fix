@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dice — Casino</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0f0a1a 100%);
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+    }
+    .left-sidebar {
+      width: 210px;
+      padding: 18px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background: linear-gradient(180deg, rgba(255,215,0,0.07) 0%, rgba(255,215,0,0) 100%);
+      border-right: 3px solid rgba(255,215,0,0.24);
+      box-shadow: inset -6px 0 16px rgba(0,0,0,0.3), 5px 0 12px rgba(255,215,0,0.06);
+    }
+    .sidebar-balance, .sidebar-result, .sidebar-last-roll {
+      text-align: center;
+      padding: 12px 8px;
+      border-radius: 12px;
+      margin-bottom: 5px;
+    }
+    .sidebar-balance {
+      background: linear-gradient(135deg, rgba(0,255,0,0.10) 0%, rgba(0,255,0,0.02) 100%);
+      border: 2px solid rgba(0,255,0,0.20);
+      box-shadow: 0 4px 10px rgba(0,255,0,0.1), inset 0 1px 0 rgba(0,255,0,0.1);
+    }
+    .sidebar-balance p { font-size: 0.72em; color: #aaa; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+    .sidebar-balance .amount {
+      font-size: 1.7em; color: #00ff00; font-weight: 900;
+      text-shadow: 0 0 12px rgba(0,255,0,0.45); letter-spacing: 1px; display: block;
+    }
+    .sidebar-result { min-height: 46px; font-size: 0.95em; padding: 8px 5px; }
+    .sidebar-result.win { background: linear-gradient(135deg, rgba(0,255,0,0.13) 0%, rgba(0,255,0,0.05) 100%); border: 2px solid rgba(0,255,0,0.31); color: #00ff00; }
+    .sidebar-result.lose { background: linear-gradient(135deg, rgba(255,85,85,0.13) 0%, rgba(255,85,85,0.05) 100%); border: 2px solid rgba(255,85,85,0.31); color: #ff5555; }
+    .sidebar-result-text { font-size: 1em; font-weight: 700; margin-bottom: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .sidebar-result-amount { font-size: 1em; font-weight: 900; letter-spacing: 1px; text-shadow: 0 0 8px rgba(255,255,255,0.14); }
+    .sidebar-last-roll {
+      border: 1.5px solid #ffd700;
+      background: rgba(255,237,78,0.075);
+      color: #ffd700;
+      font-size: 0.96em;
+      margin-top: 0;
+    }
+    #dice-container {
+      max-width: 740px;
+      margin: 0 auto 0 0;
+      padding: 25px 18px 18px 18px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .header-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px; padding: 12px 19px; background: linear-gradient(135deg, rgba(255,215,0,0.12) 0%, rgba(255,215,0,0.04) 100%);
+      border: 2px solid rgba(255,215,0,0.18); border-radius: 11px; box-shadow: 0 3px 12px rgba(255,215,0,0.04);
+    }
+    .header-bar h1 {
+      margin: 0; font-size: 1.41em;
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; font-weight: 900; letter-spacing: 1px;
+    }
+    .back-link { color: #aaa; text-decoration: none; font-size: 0.93em; padding: 6px 15px;
+      border: 2px solid rgba(255,215,0,0.16); border-radius: 8px; transition: all 0.3s; }
+    .back-link:hover { color: #ffd700; border-color: #ffd700; background: rgba(255,215,0,0.1);}
+    .table {
+      background: linear-gradient(135deg, #164d1a 0%, #20722c 100%);
+      border: 4px solid #44aa44;
+      border-radius: 19px;
+      padding: 27px 13px 28px 13px;
+      margin-bottom: 7px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.19), inset 0 0 14px rgba(68,170,68,0.09);
+      position: relative;
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 410px; max-height: 540px; height: 410px;
+      justify-content: flex-start;
+    }
+    #game-area {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      gap: 32px;
+      align-items: flex-start;
+      justify-content: center;
+      margin-bottom: 13px;
+      min-height: 220px;
+    }
+    #dice-controls {
+      min-width:230px; max-width:330px;
+      display:flex; flex-direction:column; gap:12px;
+      background: linear-gradient(135deg,rgba(255,215,0,0.08),rgba(0,0,0,0.02));
+      border: 1.8px solid rgba(255,215,0,0.12);
+      border-radius:11px; padding:16px 18px 13px 18px;
+      font-size: 1.13em;
+      align-self: flex-start;
+    }
+    #dice-controls label {
+      color: #ffd700;
+      font-weight: bold;
+      font-size: 1em;
+      margin-bottom: 2px;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #dice-controls input[type="number"] {
+      padding: 8px 12px;
+      font-size: 1em;
+      border: 2px solid rgba(255,215,0,0.23);
+      border-radius: 6px;
+      background: #181d23;
+      color: #fff;
+      font-weight: bold;
+      width: 89px;
+      margin-left: 8px;
+    }
+    #dice-controls select {
+      padding: 8px 12px;
+      font-size: 1em;
+      border: 2px solid #ffd700;
+      border-radius: 8px;
+      background: #38495a;
+      color: #fff;
+      font-weight: bold;
+      width: 134px;
+      margin-left: 8px;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      box-shadow: none;
+      outline: none;
+    }
+    #dice-controls select option {
+      background: #38495a;
+      color: #fff;
+    }
+    #dice-controls input:focus,
+    #dice-controls select:focus {
+      outline: none;
+      border-color: #ffd700;
+      background: rgba(255,215,0,0.16);
+      box-shadow: 0 0 8px rgba(255,215,0,0.13);
+    }
+    #dice-controls button {
+      padding: 12px 19px;
+      border-radius: 9px;
+      border: none;
+      font-size: 1.06em;
+      font-weight: bold;
+      letter-spacing: 0.8px;
+      background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+      color: #181818;
+      margin-top: 2px;
+      cursor: pointer;
+      transition: filter .2s, box-shadow .2s;
+      min-width: 90px;
+    }
+    #dice-controls button:active { filter: brightness(0.96);}
+    #quick { background: linear-gradient(135deg, #00d960 0%, #00b84d 100%); color: #fff; }
+    #quick:hover { background: linear-gradient(135deg,#00ff6b 0%,#00d960 100%);}
+    #roll:hover { box-shadow: 0 4px 16px rgba(255,239,78,0.16);}
+    .muted { color: #9aa4b2; font-size: 1.11em;}
+    #dice-canvas {
+      background:linear-gradient(#04111a,#071018);
+      border-radius:12px;display:block;margin-top:6px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.14);
+      width: 320px;
+      height: 170px;
+      min-width: 220px;
+      min-height: 120px;
+      max-width: 400px;
+      max-height: 200px;
+    }
+    /* <<< Position the entire result window (canvas) >>> */
+    .dice-canvas-holder {
+      flex:1;
+      min-width:220px;
+      max-width:350px;
+      text-align:center;
+      margin-left: -150px; /* move left from center */
+      margin-top: 125px;   /* move down from center */
+    }
+    #dice-log {
+      margin-top:32px;
+      font-size:1.13em;
+      width:100%;
+      text-align:center;
+    }
+    footer { margin-top:16px; text-align:center; color:#9aa4b2; }
+    @media (max-width: 900px) {.left-sidebar {display:none !important;}}
+  </style>
+</head>
+<body>
+  <div class="left-sidebar">
+    <div class="sidebar-balance">
+      <p>💰 Balance</p>
+      <div class="amount" id="sidebar-bankroll">$0</div>
+    </div>
+    <div class="sidebar-last-roll" id="sidebar-last-roll">
+      <div style="font-size:0.93em;font-weight:bold;">🎯 Last Roll</div>
+      <div style="font-size:0.99em;margin-top:2px;" id="sidebar-last-roll-txt">-</div>
+    </div>
+    <div class="sidebar-result" id="sidebar-result">
+      <div class="sidebar-result-text" id="sidebar-result-text">Result</div>
+      <div class="sidebar-result-amount" id="sidebar-result-amount">$0</div>
+    </div>
+  </div>
+  <div id="dice-container">
+    <span id="bankroll" style="display:none"></span>
+    <div class="header-bar">
+      <h1>🎲 DICE</h1>
+      <a href="../../index.html" class="back-link">← Back</a>
+    </div>
+    <div class="table">
+      <section id="game-area">
+        <div>
+          <p class="muted" style="margin-bottom:7px;">Set your bet, choose Higher or Lower (roll is 1–6), then roll once.</p>
+          <div id="dice-controls">
+            <label>Bet Amount: <input id="bet" type="number" min="1" value="10"></label>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:5px;">
+              <div><strong>Free roll:</strong> <span id="shown-roll">-</span></div>
+              <div><button id="reroll" type="button">Reroll</button></div>
+            </div>
+            <label>Choose:
+              <select id="direction">
+                <option value="lower">Lower (roll &lt; shown)</option>
+                <option value="higher">Higher (roll &gt; shown)</option>
+              </select>
+            </label>
+            <div style="display:flex;gap:9px;margin-bottom:7px;">
+              <button id="roll">Roll</button>
+              <button id="quick">Quick</button>
+            </div>
+            <div><strong>Payout:</strong> <span id="payout">x0.00</span></div>
+            <div><strong>Last roll:</strong> <span id="last-roll">-</span></div>
+          </div>
+        </div>
+        <div class="dice-canvas-holder">
+          <canvas id="dice-canvas" width="350" height="170"></canvas>
+        </div>
+      </section>
+      <div id="dice-log"></div>
+    </div>
+    <footer><small>One roll per bet. Higher chance → lower payout.</small></footer>
+  </div>
+  <script>
+    // Sidebar sync logic dice
+    function syncSidebar() {
+      var bankroll = document.getElementById('bankroll')?.textContent || '$0';
+      document.getElementById('sidebar-bankroll').textContent = bankroll;
+      var last = document.getElementById('last-roll')?.textContent || '-';
+      document.getElementById('sidebar-last-roll-txt').textContent = last;
+      // Result (extract won $)
+      var logEl = document.getElementById('dice-log');
+      var res = "-";
+      if(logEl && logEl.textContent.match(/payout\s+\$?([\d.]+)/i)){
+        res = logEl.textContent.match(/payout\s+\$?([\d.]+)/i)[1];
+      } else if(logEl && logEl.textContent.match(/lost\s+\$?([\d.]+)/i)){
+        res = "-"+logEl.textContent.match(/lost\s+\$?([\d.]+)/i)[1];
+      } else if(logEl && logEl.textContent.match(/returned\s+\$?([\d.]+)/i)) {
+        res = "$0";
+      }
+      document.getElementById('sidebar-result-amount').textContent = res === "-" ? "-" : (res.startsWith('-') ? res : "$"+res);
+      document.getElementById('sidebar-result-text').textContent = res === "-" ? "RESULT" : (res.startsWith('-') ? "LOSE" : (res==="0"||res==="$0" ? "PUSH" : "WIN!"));
+      var box = document.getElementById('sidebar-result');
+      box.className = "sidebar-result" +
+        ((res !== "-" && !res.startsWith('-') && res!=="0" && res!=="$0") ? " win" 
+        : (res.startsWith('-') ? " lose" : ""));
+    }
+    setInterval(syncSidebar, 200);
+  </script>
+  <script src="main.js"></script>
+</body>
+</html>
