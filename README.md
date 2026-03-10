@@ -1,5 +1,6 @@
 
-# Single-Player Casino — Game Suite
+# Single-Player Casino — Game Suite 
+# (This whole repository is made using different AI modules. Point being testing how powerfull AI is in programming )
 
 This workspace contains a small, local, single-player gambling simulator with a game selector and individual game pages. All data is stored locally in the browser's `localStorage`.
 
