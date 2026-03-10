@@ -1,3 +1,5 @@
+# GAMBLING IS BAD, DO NOT GAMBLE AND I DO NOT CONDOLE GAMBLING. NO REAL MONEY IS INVOLWED AND THIS IS MADE PURELY FOR SINGLE PLAYER LOCAL USAGE!!!
+
 
 # Single-Player Casino — Game Suite 
 # (This whole repository is made using different AI modules. Point being testing how powerfull AI is in programming )
